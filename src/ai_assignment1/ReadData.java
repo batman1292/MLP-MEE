@@ -6,19 +6,11 @@
 package ai_assignment1;
 
 import java.io.BufferedReader;
-import java.io.DataInput;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.io.LineNumberReader;
 
 /**
  *
@@ -29,10 +21,14 @@ public class ReadData {
     private int NumClassInput;
     private int NumClassOutput;
     private int NumData;
-    private LinkedList<Double> DataClassInput = new LinkedList<>();
-    private LinkedList<Integer> DataClassOutput = new LinkedList<>();
-    private LinkedList<LinkedList<Double>> DataInput = new LinkedList<>();
-    private LinkedList<LinkedList<Integer>> DataOutput = new LinkedList<>();
+//    private double DataClassInput[];
+//    private int DataClassOutput[];
+    private double DataInput[][];
+    private int DataOutput[][];
+//    private ArrayList<Double> DataClassInput = new ArrayList<>();
+//    private ArrayList<Integer> DataClassOutput = new ArrayList<>();
+//    private ArrayList<ArrayList<Double>> DataInput = new ArrayList<>();
+//    private ArrayList<ArrayList<Integer>> DataOutput = new ArrayList<>();
 
     public ReadData(String filename, int num_class_input, int num_class_output) throws FileNotFoundException, IOException {
         this.NumClassInput = num_class_input;
@@ -56,34 +52,57 @@ public class ReadData {
     private void ReadingFile(String filename) throws FileNotFoundException, IOException {
         String path = "D:\\BVH\\MEE\\AI\\Intiligent System\\task2\\AI_Assignment1(P'Jib)\\Ai_assignment1\\src\\ai_assignment1\\" + filename;
         File file = new File(path);
-
+        setNumDataFormFile(filename);
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
+            int current_line = 0;
             while ((line = br.readLine()) != null) {
-                this.DataClassInput.clear();
-                this.DataClassOutput.clear();
-                this.NumData++;
                 String[] ary = line.split(",");
-                for (int i = 0; i < ary.length + 1; i++) {
-//                    System.out.println(ary[i]);
+                for (int i = 0; i < ary.length; i++) {
                     if (i < this.NumClassInput) {
-//                        System.out.println(Double.parseDouble(ary[i]));
-                        this.DataClassInput.addLast(Double.parseDouble(ary[i]));
-                    } else if (i == ary.length) {
-                        this.DataInput.addLast(this.DataClassInput);
-                        this.DataOutput.addLast(this.DataClassOutput);
+                        this.DataInput[current_line][i] = Double.parseDouble(ary[i]);
                     } else {
-                        this.DataClassOutput.addLast(Integer.parseInt(ary[i]));
+                        this.DataOutput[current_line][i-this.NumClassInput] = Integer.parseInt(ary[i]);
                     }
                 }
+                current_line++;
             }
-            System.out.println(this.DataInput.toString());
-            System.out.println(this.DataOutput.toString());
             br.close();
+            showDataArray();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+    }
+
+    private void setNumDataFormFile(String filename) throws FileNotFoundException, IOException {
+        String path = "D:\\BVH\\MEE\\AI\\Intiligent System\\task2\\AI_Assignment1(P'Jib)\\Ai_assignment1\\src\\ai_assignment1\\" + filename;
+        File file = new File(path);
+        LineNumberReader lnr = new LineNumberReader(new FileReader(file));
+        lnr.skip(Long.MAX_VALUE);
+        this.NumData = lnr.getLineNumber() + 1;
+        this.DataInput = new double [this.NumData][this.NumClassInput];
+        this.DataOutput = new int [this.NumData][this.NumClassOutput];
+        lnr.close();
+    }
+    
+    private void showDataArray(){
+        System.out.println("DataInput : ");
+        for (int i = 0; i<this.NumData; i++){
+            for (int j= 0; j<this.NumClassInput; j++){
+                System.out.print(this.DataInput[i][j]);
+                System.out.print(" ");
+            }
+            System.out.println(" ");
+        }
+        System.out.println("DataOutput : ");
+        for (int i = 0; i<this.NumData; i++){
+            for (int j= 0; j<this.NumClassOutput; j++){
+                System.out.print(this.DataOutput[i][j]);
+                System.out.print(" ");
+            }
+            System.out.println(" ");
         }
     }
 
